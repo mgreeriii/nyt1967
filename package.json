@@ -1,0 +1,15 @@
+{
+  "name": "nyt-1967",
+  "version": "1.0.0",
+  "description": "Bot to tweet out Vietnam-related articles published by the New York Times in 1967 & 1968",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marshall Greer",
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.18.1",
+    "request": "^2.81.0"
+  }
+}
