@@ -9,6 +9,7 @@
   "author": "Marshall Greer",
   "license": "ISC",
   "dependencies": {
+    "config": "^1.26.1",
     "moment": "^2.18.1",
     "request": "^2.81.0"
   }
