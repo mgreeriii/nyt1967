@@ -1,17 +1,35 @@
 var request = require("request");
 var moment = require("moment");
 var config = require("config");
+var fs = require("fs");
 
 // local modules
 var makeRequest = require('./make_request');
 
 var apiConfig = config.get("apiConfig");
 
+function rmDir(dirPath) {
+    try { var files = fs.readdirSync(dirPath); }
+    catch(e) { return; }
+    if (files.length > 0)
+        for (var i = 0; i < files.length; i++) {
+            var filePath = dirPath + '/' + files[i];
+            if (fs.statSync(filePath).isFile())
+                fs.unlinkSync(filePath);
+            else
+                rmDir(filePath);
+        }
+    fs.rmdirSync(dirPath);
+}
+// remove any PDFs
+rmDir("temp");
+
+// and make it anew
+fs.mkdirSync("temp");
+
 // nyt query
 var key = apiConfig.get("nytKey");
 var query = "viet OR nam OR cambodia OR communism";
-
-// 50 years ago today
 var date = moment().subtract(50, "years");
 
 request.get({

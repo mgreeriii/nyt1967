@@ -16,3 +16,8 @@ pids
 
 # Dependency directories
 node_modules/
+
+# temp directory for images
+temp/
+
+.DS_Store

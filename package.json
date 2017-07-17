@@ -9,8 +9,10 @@
   "author": "Marshall Greer",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "config": "^1.26.1",
     "moment": "^2.18.1",
+    "pdf-image": "^1.1.0",
     "request": "^2.81.0",
     "underscore": "^1.8.3"
   }

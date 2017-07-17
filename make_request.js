@@ -1,6 +1,8 @@
 var request = require("request");
 var _ = require("underscore");
 
+var downloadPDF = require('./download_pdf');
+
 // underscore rate limit function
 _.rateLimit = function(func, rate, async) {
     var queue = [];
@@ -33,6 +35,24 @@ _.rateLimit = function(func, rate, async) {
 
 };
 
+function buildStatusMessage(tweetHeadline) {
+    var tweetHashtag = '#1967LIVE';
+
+    var endLen = tweetHashtag.length + 1;
+
+    // the tweet content is dependent upon the length of the statusMsg
+    // if the statusMsg is too long, we'll truncate it and add trailing ellipses
+    if (tweetHeadline.length > (140 - endLen - 3)) {
+        tweetHeadline = tweetHeadline.substr(0 , (140 - endLen - 3));
+
+        // add the ellipses
+        var li = tweetHeadline.lastIndexOf(" ");
+        tweetHeadline = tweetHeadline.substr(0, li) + "...";
+    }
+
+    return tweetHeadline +  " " + tweetHashtag;
+}
+
 function makeRequest(key , query, date, page) {
     request.get({
         url: "https://api.nytimes.com/svc/search/v2/articlesearch.json",
@@ -51,25 +71,21 @@ function makeRequest(key , query, date, page) {
         docs.forEach(function(d, i) {
             var tweetObj = {};
 
-            tweetObj.statusMsg = d.headline.main;
-            var tweetHeadline = tweetObj.statusMsg;
-            var tweetHashtag = '#1967LIVE';
+            // compose the tweet status message
+            tweetObj.statusMsg = buildStatusMessage(d.headline.main);
 
-            var endLen = tweetHashtag.length + 1;
-
-            // the tweet content is dependent upon the length of the statusMsg
-            // if the statusMsg is too long, we'll truncate it and add trailing ellipses
-            if (tweetHeadline.length > (140 - endLen - 3)) {
-                tweetHeadline = tweetHeadline.substr(0 , (140 - endLen - 3));
-
-                // add the ellipses
-                var li = tweetHeadline.lastIndexOf(" ");
-                tweetHeadline = tweetHeadline.substr(0, li) + "...";
-            }
-
-            tweetObj.statusMsg = tweetHeadline +  " " + tweetHashtag;
+            // set source url of the article
+            tweetObj.url = "http://query.nytimes.com/mem/archive-free/pdf?res=" + d.web_url.split("res=")[1];
 
             console.log("Tweet status: " + tweetObj.statusMsg);
+            console.log("Tweet article url: " + tweetObj.url + "\n");
+            // some variables for creating a unique pdf file name
+            tweetObj.date = d.pub_date.split("T")[0];
+            tweetObj.page = page + 1;
+            tweetObj.pageIndex = i + 1;
+
+            tweetObj.pdfFileName = "temp/" + tweetObj.date + "_" + tweetObj.page + "_" + tweetObj.pageIndex + ".pdf";
+            downloadPDF(tweetObj.url, tweetObj.pdfFileName);
         });
     });
 }
